@@ -83,8 +83,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.border
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Brush
@@ -801,12 +803,22 @@ private fun FloatingNavItem(
         animationSpec = navSpring(),
         label = "navItemPadding",
     )
+    // Compose clickable surfaces participate in TV DPAD focus traversal.
+    // Keep the original pill styling, but make the focused target unmistakable.
+    var isRemoteFocused by remember { mutableStateOf(false) }
 
     Surface(
         onClick = onClick,
         shape = PillShape,
         color = backgroundColor,
-        modifier = modifier.height(48.dp),
+        modifier = modifier
+            .height(48.dp)
+            .onFocusChanged { isRemoteFocused = it.isFocused }
+            .border(
+                width = if (isRemoteFocused) 2.dp else 0.dp,
+                color = if (isRemoteFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
+                shape = PillShape,
+            ),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
